@@ -3,7 +3,7 @@ package middleware
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/betacraft/yaag/yaag/models"
+	"github.com/manGoweb/yaag/yaag/models"
 	"net/http"
 	"net/http/httptest"
 	"testing"

@@ -78,9 +78,9 @@ const Template = `<!DOCTYPE html>
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="#">{{.Title}}</a>
-            <p class="navbar-text">Developed by Gophers at <a href="http://betacraft.co">Betacraft</a></p>
+            <p class="navbar-text">Developed by Gophers at <a href="http://manGoweb.co">manGoweb</a></p>
         </div>
-            
+
         <!-- /.navbar-collapse -->
     </div>
     <!-- /.container-fluid -->
@@ -95,7 +95,7 @@ const Template = `<!DOCTYPE html>
                     <p>{{$key}} : <strong>{{ $value }}</strong></p>
                 {{ end }}
               </div>
-            </div>    
+            </div>
         <ul class="nav nav-pills nav-stacked" role="tablist">
             {{ range $key, $value := .array }}
                 <li role="presentation"><a href="#{{$key}}top" role="tab" data-toggle="tab">{{$value.HttpVerb}} : {{$value.Path}}</a></li>

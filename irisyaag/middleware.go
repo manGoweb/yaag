@@ -3,9 +3,9 @@ package irisyaag
 import (
 	"strings"
 
-	"github.com/betacraft/yaag/middleware"
-	"github.com/betacraft/yaag/yaag"
-	"github.com/betacraft/yaag/yaag/models"
+	"github.com/manGoweb/yaag/middleware"
+	"github.com/manGoweb/yaag/yaag"
+	"github.com/manGoweb/yaag/yaag/models"
 
 	"github.com/kataras/iris/context" // after go 1.9, users can use iris package directly.
 )
