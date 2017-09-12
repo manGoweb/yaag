@@ -36,12 +36,19 @@ var reqWriteExcludeHeaderDump = map[string]bool{
 	"User-Agent":        false,
 }
 
+type SpecFn func(spec *models.ApiCall)
+
 type YaagHandler struct {
 	nextHandler http.Handler
+	specFn SpecFn
 }
 
 func Handle(nextHandler http.Handler) http.Handler {
 	return &YaagHandler{nextHandler: nextHandler}
+}
+
+func PostprocessingHandle(nextHandler http.Handler, specFn SpecFn) http.Handler {
+	return &YaagHandler{nextHandler: nextHandler, specFn: specFn}
 }
 
 func (y *YaagHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -53,10 +60,11 @@ func (y *YaagHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	apiCall := models.ApiCall{}
 	Before(&apiCall, r)
 	y.nextHandler.ServeHTTP(writer, r)
-	After(&apiCall, writer, w, r)
+	After(&apiCall, writer, w, r, y.specFn)
 }
 
 func HandleFunc(next func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
+	noop := func(spec *models.ApiCall) {}
 	return func(w http.ResponseWriter, r *http.Request) {
 		if !yaag.IsOn() {
 			next(w, r)
@@ -66,7 +74,7 @@ func HandleFunc(next func(http.ResponseWriter, *http.Request)) func(http.Respons
 		writer := httptest.NewRecorder()
 		Before(&apiCall, r)
 		next(writer, r)
-		After(&apiCall, writer, w, r)
+		After(&apiCall, writer, w, r, noop)
 	}
 }
 
@@ -196,7 +204,7 @@ func ReadBody(req *http.Request) *string {
 	return &body
 }
 
-func After(apiCall *models.ApiCall, record *httptest.ResponseRecorder, output http.ResponseWriter, r *http.Request) {
+func After(apiCall *models.ApiCall, record *httptest.ResponseRecorder, output http.ResponseWriter, r *http.Request, specFn SpecFn) {
 	if strings.Contains(r.RequestURI, ".ico") {
 		fmt.Fprintf(output, record.Body.String())
 		return
@@ -208,6 +216,7 @@ func After(apiCall *models.ApiCall, record *httptest.ResponseRecorder, output ht
 	apiCall.ResponseCode = record.Code
 	apiCall.ResponseHeader = ReadHeadersFromResponse(record)
 	if record.Code != 404 {
+		specFn(apiCall)
 		go yaag.GenerateHtml(apiCall)
 	}
 	for key, value := range apiCall.ResponseHeader {

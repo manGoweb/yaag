@@ -31,6 +31,8 @@ func TestAfterSetContentType(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	noop := func(spec *models.ApiCall) {}
+
 	for _, test := range tests {
 		request := httptest.NewRequest(http.MethodGet, "/test", nil)
 		record := httptest.NewRecorder()
@@ -39,7 +41,7 @@ func TestAfterSetContentType(t *testing.T) {
 		record.Body = body
 
 		outputRecorder := httptest.NewRecorder()
-		After(&models.ApiCall{}, record, outputRecorder, request)
+		After(&models.ApiCall{}, record, outputRecorder, request, noop)
 
 		if outputRecorder.Code != test.code {
 			t.Errorf("expected code to be %d, was %s", test.code, outputRecorder.Code)

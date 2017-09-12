@@ -32,7 +32,6 @@ func Init(conf *Config) {
 	defer dataFile.Close()
 	if err == nil {
 		json.NewDecoder(io.Reader(dataFile)).Decode(spec)
-		config.PostProcessor(spec)
 		generateHtml()
 	}
 }
